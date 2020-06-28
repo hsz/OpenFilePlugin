@@ -35,8 +35,14 @@ repositories {
     mavenCentral()
     jcenter()
 }
+
 dependencies {
+    val ktorVersion = "1.3.2"
+
     implementation(kotlin("stdlib-jdk8"))
+    implementation("io.ktor:ktor-client-json:$ktorVersion")
+    implementation("io.ktor:ktor-client-gson:$ktorVersion")
+    implementation("io.ktor:ktor-client-okhttp:$ktorVersion")
     detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.10.0-RC1")
 }
 
@@ -105,4 +111,12 @@ tasks {
         dependsOn("patchChangelog")
         token(System.getenv("PUBLISH_TOKEN"))
     }
+}
+val compileKotlin: KotlinCompile by tasks
+compileKotlin.kotlinOptions {
+    jvmTarget = "1.8"
+}
+val compileTestKotlin: KotlinCompile by tasks
+compileTestKotlin.kotlinOptions {
+    jvmTarget = "1.8"
 }

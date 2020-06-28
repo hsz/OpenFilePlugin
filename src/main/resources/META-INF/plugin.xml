@@ -1,19 +1,15 @@
 <idea-plugin url="www.jetbrains.com">
-    <id>com.github.hsz.openfileplugin</id>
-    <name>OpenFilePlugin</name>
-    <vendor>hsz</vendor>
+    <id>com.openfileplugin</id>
+    <name>Open File</name>
+    <vendor>Tomasz Mieczkowski</vendor>
 
     <!-- Product and plugin compatibility requirements -->
     <!-- https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html -->
     <depends>com.intellij.modules.platform</depends>
 
-    <extensions defaultExtensionNs="com.intellij">
-        <applicationService serviceImplementation="com.github.hsz.openfileplugin.services.MyApplicationService"/>
-        <projectService serviceImplementation="com.github.hsz.openfileplugin.services.MyProjectService"/>
-    </extensions>
-
-    <projectListeners>
-        <listener class="com.github.hsz.openfileplugin.listeners.MyProjectManagerListener"
-                  topic="com.intellij.openapi.project.ProjectManagerListener"/>
-    </projectListeners>
+    <actions>
+        <action class="com.openfileplugin.actions.ClipboardHandlerAction">
+            <keyboard-shortcut keymap="$default" first-keystroke="control shift alt O"/>
+        </action>
+    </actions>
 </idea-plugin>

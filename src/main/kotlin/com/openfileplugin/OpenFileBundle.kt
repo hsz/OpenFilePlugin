@@ -1,13 +1,13 @@
-package com.github.hsz.openfileplugin
+package com.openfileplugin
 
 import com.intellij.AbstractBundle
 import org.jetbrains.annotations.NonNls
 import org.jetbrains.annotations.PropertyKey
 
 @NonNls
-private const val BUNDLE = "messages.MyBundle"
+private const val BUNDLE = "messages.OpenFile"
 
-object MyBundle : AbstractBundle(BUNDLE) {
+object OpenFileBundle : AbstractBundle(BUNDLE) {
 
     @Suppress("SpreadOperator")
     @JvmStatic
