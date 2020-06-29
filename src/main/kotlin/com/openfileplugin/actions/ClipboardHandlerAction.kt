@@ -6,6 +6,8 @@ import com.intellij.notification.Notifications
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.application.ex.ClipboardUtil
+import com.intellij.openapi.editor.LogicalPosition
+import com.intellij.openapi.editor.ScrollType
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFileManager
@@ -22,6 +24,10 @@ import kotlinx.coroutines.runBlocking
 
 class ClipboardHandlerAction : AnAction() {
 
+    companion object {
+        private const val HOST = "https://www.openfileplugin.com/open.php"
+    }
+
     private val client = HttpClient(OkHttp) {
         install(JsonFeature) {
             serializer = GsonSerializer()
@@ -33,28 +39,37 @@ class ClipboardHandlerAction : AnAction() {
         val project = e.project ?: return
         val text = ClipboardUtil.getTextInClipboard() ?: return project.notify(OpenFileBundle.message("emptyClipboard"))
         val lineRegex = """^ on line (\d+)""".toRegex()
-        val host = "https://www.openfileplugin.com/open.php"
 
         URLUtil.URL_PATTERN.toRegex().findAll(text).forEach {
             val url = it.value
             val line = lineRegex.find(text.substring(it.range.last + 1))?.groupValues?.get(1)
             val path = runBlocking {
-                client.post<String>(host) {
+                client.post<String>(HOST) {
                     body = MultiPartFormDataContent(formData {
-                        append("scan", listOfNotNull(url, line).joinToString(":"))
+                        append("scan", url)
                     })
                 }
             }
 
-            val file = VirtualFileManager.getInstance().findFileByUrl(path)
-                ?: return project.notify(OpenFileBundle.message("localFileNotFound", path))
+            val file = VirtualFileManager.getInstance().findFileByUrl("file://$path")
 
-            FileEditorManager.getInstance(project).openFile(file, true)
+            if (file == null) {
+                project.notify(OpenFileBundle.message("localFileNotFound", path))
+            } else {
+                FileEditorManager.getInstance(project).apply {
+                    openFile(file, true)
+                    selectedTextEditor?.apply {
+                        caretModel.moveToLogicalPosition(LogicalPosition(line?.toInt()?.minus(1) ?: 0, 0))
+                        scrollingModel.scrollToCaret(ScrollType.CENTER)
+                    }
+                }
+            }
         }
     }
 
     private fun Project.notify(message: String) {
-        val notification = Notification("OpenFile", "OpenFile", message, NotificationType.INFORMATION)
+        val name = OpenFileBundle.message("name")
+        val notification = Notification(name, name, message, NotificationType.INFORMATION)
         Notifications.Bus.notify(notification, this)
     }
 }
