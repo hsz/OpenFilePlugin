@@ -1,14 +1,20 @@
-# OpenFilePlugin
+# Open File Plugin
 
 ![Build](https://github.com/hsz/OpenFilePlugin/workflows/Build/badge.svg)
 
 <!-- Plugin description -->
-This Fancy IntelliJ Platform Plugin is going to be your implementation of the brilliant ideas that you have.
+Open File plugin will allow you to quickly open your files by searching for URL paths inside your clipboard
+and converting them to file paths that match your preferences.
 
-This specific section is a source for the [plugin.xml](./src/main/resources/META-INF/plugin.xml) file which will be
-extracted by the [Gradle](./build.gradle.kts) during the build process.
+![Open File Plugin](https://www.openfileplugin.com/images/shortcut.jpg)
 
-To keep everything working, do not remove `<!-- ... -->` sections. 
+**Setup Instructions:**
+
+- Install this plugin
+- Go to plugin homepage: <a href="https://www.openfileplugin.com/">https://www.openfileplugin.com/</a>
+- Add your own URLs to the list along with conversion paths
+- Copy a provided sample URL path
+- Come back to the browser and use a shortcut: CTRL + SHIFT + ALT + O
 <!-- Plugin description end -->
 
 ## Installation
