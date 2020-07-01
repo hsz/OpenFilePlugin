@@ -10,11 +10,11 @@ and converting them to file paths that match your preferences.
 
 **Setup Instructions:**
 
-- Install this plugin
-- Go to plugin homepage: <a href="https://www.openfileplugin.com/">https://www.openfileplugin.com/</a>
-- Add your own URLs to the list along with conversion paths
-- Copy a provided sample URL path
-- Come back to the browser and use a shortcut: CTRL + SHIFT + ALT + O
+- Install this plugin.
+- Go to plugin homepage: [www.openfileplugin.com](https://www.openfileplugin.com)
+- Add your own URLs to the list along with conversion paths.
+- Copy a provided sample URL path.
+- Come back to the browser and use a shortcut: `CTRL + SHIFT + ALT + O`.
 <!-- Plugin description end -->
 
 ## Installation
