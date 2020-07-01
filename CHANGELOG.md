@@ -2,7 +2,7 @@
 
 # OpenFilePlugin Changelog
 
-## [0.0.3]
+## [Unreleased]
 ### Added
 - Plugin icon and description
 
