@@ -1,4 +1,4 @@
-<idea-plugin url="www.jetbrains.com">
+<idea-plugin>
     <id>com.openfileplugin</id>
     <name>Open File</name>
     <vendor>Tomasz Mieczkowski</vendor>
