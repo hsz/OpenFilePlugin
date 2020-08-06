@@ -10,6 +10,7 @@ import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.editor.ScrollType
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.util.io.URLUtil
 import com.openfileplugin.OpenFileBundle
@@ -38,31 +39,32 @@ class ClipboardHandlerAction : AnAction() {
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
         val text = ClipboardUtil.getTextInClipboard() ?: return project.notify(OpenFileBundle.message("emptyClipboard"))
-        val lineRegex = """^ on line (\d+)""".toRegex()
+        val lineRegex = "^ on line (\\d+)".toRegex()
 
         URLUtil.URL_PATTERN.toRegex().findAll(text).forEach {
             val url = it.value
             val line = lineRegex.find(text.substring(it.range.last + 1))?.groupValues?.get(1)
             val path = runBlocking {
                 client.post<String>(HOST) {
-                    body = MultiPartFormDataContent(formData {
-                        append("scan", url)
-                    })
+                    body = MultiPartFormDataContent(
+                        formData {
+                            append("scan", url)
+                        }
+                    )
                 }
             }
 
             val file = VirtualFileManager.getInstance().findFileByUrl("file://$path")
+            file?.open(project, line) ?: project.notify(OpenFileBundle.message("localFileNotFound", path))
+        }
+    }
 
-            if (file == null) {
-                project.notify(OpenFileBundle.message("localFileNotFound", path))
-            } else {
-                FileEditorManager.getInstance(project).apply {
-                    openFile(file, true)
-                    selectedTextEditor?.apply {
-                        caretModel.moveToLogicalPosition(LogicalPosition(line?.toInt()?.minus(1) ?: 0, 0))
-                        scrollingModel.scrollToCaret(ScrollType.CENTER)
-                    }
-                }
+    private fun VirtualFile.open(project: Project, line: String?) {
+        FileEditorManager.getInstance(project).apply {
+            openFile(this@open, true)
+            selectedTextEditor?.apply {
+                caretModel.moveToLogicalPosition(LogicalPosition(line?.toInt()?.minus(1) ?: 0, 0))
+                scrollingModel.scrollToCaret(ScrollType.CENTER)
             }
         }
     }
