@@ -9,6 +9,7 @@
 
 ### Changed
 - Dependencies - bump ktlint to 9.3.0
+- Upgrade Gradle Wrapper to 6.5.1
 - Update CI and Gradle configuration files
 
 ### Fixed
