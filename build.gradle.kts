@@ -11,9 +11,11 @@ plugins {
     // gradle-intellij-plugin - read more: https://github.com/JetBrains/gradle-intellij-plugin
     id("org.jetbrains.intellij") version "0.4.21"
     // gradle-changelog-plugin - read more: https://github.com/JetBrains/gradle-changelog-plugin
-    id("org.jetbrains.changelog") version "0.3.2"
+    id("org.jetbrains.changelog") version "0.4.0"
     // detekt linter - read more: https://detekt.github.io/detekt/kotlindsl.html
-    id("io.gitlab.arturbosch.detekt") version "1.10.0-RC1"
+    id("io.gitlab.arturbosch.detekt") version "1.10.0"
+    // ktlint linter - read more: https://github.com/JLLeitschuh/ktlint-gradle
+    id("org.jlleitschuh.gradle.ktlint") version "9.2.1"
 }
 
 // Import variables from gradle.properties file
@@ -35,15 +37,13 @@ repositories {
     mavenCentral()
     jcenter()
 }
-
 dependencies {
     val ktorVersion = "1.3.2"
 
-    implementation(kotlin("stdlib-jdk8"))
     implementation("io.ktor:ktor-client-json:$ktorVersion")
     implementation("io.ktor:ktor-client-gson:$ktorVersion")
     implementation("io.ktor:ktor-client-okhttp:$ktorVersion")
-    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.10.0-RC1")
+    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.10.0")
 }
 
 // Configure gradle-intellij-plugin plugin.
@@ -65,6 +65,7 @@ intellij {
 // Read more: https://detekt.github.io/detekt/kotlindsl.html
 detekt {
     config = files("./detekt-config.yml")
+    buildUponDefaultConfig = true
 
     reports {
         html.enabled = false
@@ -97,7 +98,13 @@ tasks {
         // Extract the <!-- Plugin description --> section from README.md and provide for the plugin's manifest
         pluginDescription(closure {
             File("./README.md").readText().lines().run {
-                subList(indexOf("<!-- Plugin description -->") + 1, indexOf("<!-- Plugin description end -->"))
+                val start = "<!-- Plugin description -->"
+                val end = "<!-- Plugin description end -->"
+
+                if (!containsAll(listOf(start, end))) {
+                    throw GradleException("Plugin description section not found in README.md file:\n$start ... $end")
+                }
+                subList(indexOf(start) + 1, indexOf(end))
             }.joinToString("\n").run { markdownToHTML(this) }
         })
 
@@ -110,6 +117,7 @@ tasks {
     publishPlugin {
         dependsOn("patchChangelog")
         token(System.getenv("PUBLISH_TOKEN"))
+        channels(pluginVersion.split('-').getOrElse(1) { "default" }.split('.').first())
     }
 }
 val compileKotlin: KotlinCompile by tasks
